@@ -1,0 +1,12 @@
+body{
+  background-image: url(starfield.jpg);
+}
+h2{
+  font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;
+}
+.scoreboard{
+  font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;
+  color: green;
+  text-align: center;
+}
+
