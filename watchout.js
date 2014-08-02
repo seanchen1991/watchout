@@ -4,7 +4,7 @@ var dataset = [], i = 0;
 var gameOptions = {
   height: 450,
   width: 700,
-  nEnemies: 10,
+  nEnemies: 15,
   padding: 20
 };
 
@@ -21,6 +21,20 @@ var gameBoard = d3.select(".container")
                   .append("svg")
                   .attr("width", gameOptions.width)
                   .attr("height", gameOptions.height);
+
+gameStats = {
+  score: 0,
+  highScore: 0
+};
+
+var updateScore = function() {
+  return d3.select('#current-score').text(gameStats.score.toString());
+};
+
+var updateHighScore = function() {
+  gameStats.highScore = _.max([gameStats.highScore, gameStats.score]);
+  return d3.select('#high-score').text(gameStats.highScore.toString());
+};
 
 var enemies = gameBoard.selectAll("circle")
                        .data(dataset)
@@ -125,3 +139,37 @@ Player.prototype.setUpDrag = function() {
 
 var players = [];
 players.push(new Player().render(gameBoard));
+
+var increaseScore = function() {
+  gameStats.score += 1;
+  return updateScore();
+};
+
+setInterval(increaseScore, 50);
+
+var checkCollision = function(enemies, callback) {
+  for (var i = 0; i < enemies[0].length; i++) {
+    // debugger;
+    var radiusSum = parseFloat(enemies[0][i]['r']['animVal']['value']) + players[0].r;
+    var xDiff = parseFloat(enemies[0][i]['cx']['animVal']['value']) - players[0].x;
+    var yDiff = parseFloat(enemies[0][i]['cy']['animVal']['value']) - players[0].y;
+    var separation = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
+
+    // debugger;
+    if (separation < radiusSum) {
+      return callback();
+    }
+  }
+};
+
+var onCollision = function() {
+  updateHighScore();
+  gameStats.score = 0;
+  return updateScore();
+};
+
+setInterval(function() {
+  checkCollision(enemies, onCollision);
+}, 100);
+
+
