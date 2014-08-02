@@ -1,4 +1,5 @@
-// start slingin' some d3 here.
+// initialization stuff
+
 var dataset = [], i = 0;
 
 var gameOptions = {
@@ -27,6 +28,9 @@ gameStats = {
   highScore: 0
 };
 
+
+// score stuff
+
 var updateScore = function() {
   return d3.select('#current-score').text(gameStats.score.toString());
 };
@@ -35,6 +39,16 @@ var updateHighScore = function() {
   gameStats.highScore = _.max([gameStats.highScore, gameStats.score]);
   return d3.select('#high-score').text(gameStats.highScore.toString());
 };
+
+var increaseScore = function() {
+  gameStats.score += 1;
+  return updateScore();
+};
+
+setInterval(increaseScore, 50);
+
+
+// enemies stuff
 
 var enemies = gameBoard.selectAll("circle")
                        .data(dataset)
@@ -57,6 +71,8 @@ setInterval(function() {
   update()
 }, 500);
 
+
+// player stuff
 
 var Player = function() {
   this.path = "m-7.5,1.62413c0,-5.04095 4.08318,-9.12413 9.12414,-9.12413c5.04096,0 9.70345,5.53145 11.87586,9.12413c-2.02759,2.72372 -6.8349,9.12415 -11.87586,9.12415c-5.04096,0 -9.12414,-4.08318 -9.12414,-9.12415z";
@@ -130,32 +146,20 @@ Player.prototype.setUpDrag = function() {
   return this.el.call(drag);
 };
 
-// Player.prototype.setupArrows = function() {
-//   var UpArrow, DownArrow, LeftArrow, RightArrow;
-//   this.el.on("keydown", function(){
-//     this.moveRelative((this.x - 10), this.y);
-//   });
-// };
 
 var players = [];
 players.push(new Player().render(gameBoard));
 
-var increaseScore = function() {
-  gameStats.score += 1;
-  return updateScore();
-};
 
-setInterval(increaseScore, 50);
+// collision stuff
 
 var checkCollision = function(enemies, callback) {
   for (var i = 0; i < enemies[0].length; i++) {
-    // debugger;
     var radiusSum = parseFloat(enemies[0][i]['r']['animVal']['value']) + players[0].r;
     var xDiff = parseFloat(enemies[0][i]['cx']['animVal']['value']) - players[0].x;
     var yDiff = parseFloat(enemies[0][i]['cy']['animVal']['value']) - players[0].y;
     var separation = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
 
-    // debugger;
     if (separation < radiusSum) {
       return callback();
     }
@@ -171,5 +175,3 @@ var onCollision = function() {
 setInterval(function() {
   checkCollision(enemies, onCollision);
 }, 100);
-
-
